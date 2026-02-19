@@ -1,4 +1,4 @@
-FROM alpine:3.21
+FROM alpine:3.22
 
 LABEL org.opencontainers.image.title="htpdate-server" \
       org.opencontainers.image.description="NTP server synced via HTTPS — bypass UDP/123 blocks" \
@@ -7,7 +7,7 @@ LABEL org.opencontainers.image.title="htpdate-server" \
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache \
-    chrony=4.6.1-r0 \
+    chrony=4.6.1-r1 \
     htpdate=2.0.0-r0 \
     tzdata=2025c-r0 \
  && apk upgrade --no-cache
