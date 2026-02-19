@@ -2,10 +2,7 @@ name: Build & Publish Docker Image
 
 on:
   push:
-    branches: [master]
     tags: ["v*"]
-  pull_request:
-    branches: [master]
 
 env:
   IMAGE_NAME: htpdate-server
