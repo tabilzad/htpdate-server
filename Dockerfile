@@ -2,7 +2,7 @@ FROM alpine:3.21
 
 RUN apk add --no-cache \
     chrony \
-    curl \
+    htpdate \
     tzdata
 
 COPY chrony.conf /etc/chrony/chrony.conf

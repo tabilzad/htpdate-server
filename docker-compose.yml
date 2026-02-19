@@ -15,9 +15,16 @@ services:
     ports:
       - "123:123/udp"
 
+    volumes:
+      - htpdate-drift:/var/lib/htpdate
+
     environment:
       # Space-separated list of HTTPS servers to fetch time from.
       - HTTPS_SERVERS=www.google.com www.cloudflare.com www.apple.com www.microsoft.com
-      # How often (seconds) to re-sync via HTTPS.
-      - SYNC_INTERVAL=60
+      # htpdate adaptive polling bounds (seconds).
+      - MIN_POLL=900
+      - MAX_POLL=3600
       - TZ=UTC
+
+volumes:
+  htpdate-drift:
