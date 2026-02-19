@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: .
+          severity: warning
+
+  build-test:
+    name: Build & Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t ${{ github.repository }}:test .
+
+      - name: Smoke test — chrony responds
+        run: |
+          docker run -d --name smoke --cap-add SYS_TIME \
+            -p 11123:123/udp \
+            ${{ github.repository }}:test
+          sleep 5
+          docker exec smoke chronyc tracking
+          docker stop smoke
