@@ -1,6 +1,9 @@
 .git
+.github
 .gitignore
-*.md
-docker-compose.yml
 .dockerignore
 .env
+.idea
+LICENSE
+README.md
+docker-compose.yml

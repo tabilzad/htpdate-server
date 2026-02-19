@@ -8,7 +8,7 @@ HTTPS_SERVERS="${HTTPS_SERVERS:-www.google.com www.cloudflare.com www.apple.com 
 MIN_POLL="${MIN_POLL:-900}"      # minimum polling interval in seconds (default 15 min)
 MAX_POLL="${MAX_POLL:-3600}"     # maximum polling interval in seconds (default 1 hour)
 
-log() { echo "[ntp-over-https] $*"; }
+log() { echo "[htpdate-server] $*"; }
 
 # ---------------------------------------------------------------------------
 # Setup
