@@ -1,0 +1,23 @@
+services:
+  ntp-over-https:
+    build:
+      context: .
+    # Set your registry/repo here for `docker compose push`
+    image: ${REGISTRY:-docker.io}/${IMAGE_NAME:-ntp-over-https}:${TAG:-latest}
+    container_name: ntp-over-https
+    restart: unless-stopped
+
+    # SYS_TIME is required so the container can adjust the system clock
+    # from HTTPS time sources.
+    cap_add:
+      - SYS_TIME
+
+    ports:
+      - "123:123/udp"
+
+    environment:
+      # Space-separated list of HTTPS servers to fetch time from.
+      - HTTPS_SERVERS=www.google.com www.cloudflare.com www.apple.com www.microsoft.com
+      # How often (seconds) to re-sync via HTTPS.
+      - SYNC_INTERVAL=60
+      - TZ=UTC
