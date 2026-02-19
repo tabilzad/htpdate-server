@@ -1,5 +1,10 @@
 FROM alpine:3.21
 
+LABEL org.opencontainers.image.title="htpdate-server" \
+      org.opencontainers.image.description="NTP server synced via HTTPS — bypass UDP/123 blocks" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://github.com/tabilzad/htpdate-server"
+
 RUN apk add --no-cache \
     chrony \
     htpdate \

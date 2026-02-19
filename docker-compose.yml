@@ -1,10 +1,10 @@
 services:
-  ntp-over-https:
+  htpdate-server:
     build:
       context: .
     # Set your registry/repo here for `docker compose push`
     image: ${REGISTRY:-docker.io}/${IMAGE_NAME:-ntp-over-https}:${TAG:-latest}
-    container_name: ntp-over-https
+    container_name: htpdate-server
     restart: unless-stopped
 
     # SYS_TIME is required so the container can adjust the system clock
