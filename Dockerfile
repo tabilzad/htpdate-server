@@ -5,10 +5,12 @@ LABEL org.opencontainers.image.title="htpdate-server" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://github.com/tabilzad/htpdate-server"
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache \
     chrony=4.6.1-r0 \
     htpdate=2.0.0-r0 \
-    tzdata=2025c-r0
+    tzdata=2025c-r0 \
+ && apk upgrade --no-cache
 
 COPY chrony.conf /etc/chrony/chrony.conf
 COPY entrypoint.sh /entrypoint.sh
