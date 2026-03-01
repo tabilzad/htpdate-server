@@ -10,10 +10,10 @@ that block UDP/123.
 ```
 Internet (TCP/443 — not blocked)        LAN (UDP/123)
 ─────────────────────────────────       ──────────────────
-  www.google.com ─┐                       ┌─ desktop
-  www.cloudflare.com ─┤  ┌─────────────┐  ├─ laptop
+  www.google.com ─────┐                        ┌─ desktop
+  www.cloudflare.com ─┤  ┌──────────────────┐  ├─ laptop
   www.apple.com ──────┤──│ htpdate │ chrony │──┤  server
-  www.microsoft.com ──┘  └─────────────┘  └─ raspberry pi
+  www.microsoft.com ──┘  └──────────────────┘  └─ raspberry pi
                     HTTPS Date headers       NTP responses
 ```
 
