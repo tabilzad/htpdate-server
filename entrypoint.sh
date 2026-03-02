@@ -14,6 +14,7 @@ log() { echo "[htpdate-server] $*"; }
 # Setup
 # ---------------------------------------------------------------------------
 mkdir -p /var/lib/htpdate /var/lib/chrony /var/log/chrony /run/chrony
+chown chrony:chrony /run/chrony
 chmod 750 /run/chrony
 
 log "HTTPS servers: $HTTPS_SERVERS"
