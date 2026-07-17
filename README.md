@@ -8,13 +8,13 @@ A lightweight Docker container that **serves real NTP on your LAN** while syncin
 that block UDP/123.
 
 ```
-Internet (TCP/443 — not blocked)        LAN (UDP/123)
-─────────────────────────────────       ──────────────────
-  www.google.com ─────┐                        ┌─ desktop
-  www.cloudflare.com ─┤  ┌──────────────────┐  ├─ laptop
-  www.apple.com ──────┤──│ htpdate │ chrony │──┤  server
-  www.microsoft.com ──┘  └──────────────────┘  └─ raspberry pi
-                    HTTPS Date headers       NTP responses
+Internet (TCP/443 — not blocked)               LAN (UDP/123)
+────────────────────────────────               ──────────────────
+  https://www.google.com ─────┐                        ┌─ desktop
+  https://www.apple.com ──────┤  ┌──────────────────┐  ├─ laptop
+  https://www.fastly.com ─────┤──│ htpdate │ chrony │──┤  server
+  https://www.amazon.com ─────┘  └──────────────────┘  └─ raspberry pi
+                       HTTPS Date headers            NTP responses
 ```
 
 ## Quick start
@@ -46,20 +46,25 @@ server <docker-host-ip> iburst
 | Component                                     | Role                                                                                                                                                  |
 |-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [htpdate](https://github.com/twekkel/htpdate) | Fetches `Date:` headers from HTTPS servers and disciplines the system clock — step on first poll, slew thereafter, with frequency drift compensation. |
-| [chrony](https://chrony-project.org/)         | Serves the synced system clock as a stratum-3 NTP source on UDP/123.                                                                                  |
+| [chrony](https://chrony-project.org/)         | Serves the synced system clock as a stratum-3 NTP source on UDP/123. Serve-only — htpdate owns all clock adjustments.                                 |
 
 The container requires the **`SYS_TIME`** capability so it can adjust the system clock.
+
+The entrypoint supervises both daemons: if either process dies, or htpdate stops
+syncing for `WATCHDOG_STALE` seconds, the container exits non-zero so Docker's
+restart policy (`restart: unless-stopped`) brings the pair back up together.
 
 ## Configuration
 
 All settings are passed as environment variables:
 
-| Variable        | Default                                                             | Description                                             |
-|-----------------|---------------------------------------------------------------------|---------------------------------------------------------|
-| `HTTPS_SERVERS` | `www.google.com www.cloudflare.com www.apple.com www.microsoft.com` | Space-separated list of HTTPS hosts to fetch time from. |
-| `MIN_POLL`      | `900`                                                               | Minimum polling interval in seconds (15 min).           |
-| `MAX_POLL`      | `3600`                                                              | Maximum polling interval in seconds (1 hour).           |
-| `TZ`            | `UTC`                                                               | Container timezone.                                     |
+| Variable         | Default                                                                                      | Description                                                                                                               |
+|------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `HTTPS_SERVERS`  | `https://www.google.com https://www.apple.com https://www.fastly.com https://www.amazon.com` | Space-separated list of URLs to fetch time from. Use `https://` URLs — bare hostnames fall back to plain HTTP on port 80. |
+| `MIN_POLL`       | `900`                                                                                        | Minimum polling interval in seconds (15 min).                                                                             |
+| `MAX_POLL`       | `3600`                                                                                       | Maximum polling interval in seconds (1 hour).                                                                             |
+| `WATCHDOG_STALE` | `4 × MAX_POLL`                                                                               | Exit (and let Docker restart the container) if htpdate hasn't synced for this many seconds.                               |
+| `TZ`             | `UTC`                                                                                        | Container timezone.                                                                                                       |
 
 Example with custom servers and faster polling:
 
@@ -68,7 +73,7 @@ docker run -d \
   --name htpdate-server \
   --cap-add SYS_TIME \
   -p 123:123/udp \
-  -e "HTTPS_SERVERS=time.cloudflare.com www.google.com" \
+  -e "HTTPS_SERVERS=https://www.cloudflare.com https://www.google.com" \
   -e MIN_POLL=300 \
   tabilzad/htpdate-server:latest
 ```
@@ -92,7 +97,6 @@ ntpdate -q <docker-host-ip>
 docker compose build
 docker compose up -d
 ```
-
 
 ## License
 

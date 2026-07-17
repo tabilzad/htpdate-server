@@ -19,8 +19,9 @@ services:
       - htpdate-drift:/var/lib/htpdate
 
     environment:
-      # Space-separated list of HTTPS servers to fetch time from.
-      - HTTPS_SERVERS=www.google.com www.cloudflare.com www.apple.com www.microsoft.com
+      # Space-separated list of servers to fetch time from.
+      # Use https:// URLs — bare hostnames are polled over plain HTTP (port 80).
+      - HTTPS_SERVERS=https://www.google.com https://www.apple.com https://www.fastly.com https://www.amazon.com
       # htpdate adaptive polling bounds (seconds).
       - MIN_POLL=900
       - MAX_POLL=3600

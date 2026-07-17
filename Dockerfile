@@ -5,11 +5,13 @@ LABEL org.opencontainers.image.title="htpdate-server" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://github.com/tabilzad/htpdate-server"
 
+# Fuzzy version pins: exact -rX pins break as soon as Alpine rebuilds a
+# package, since old revisions are dropped from the repo index.
 # hadolint ignore=DL3018
 RUN apk add --no-cache \
-    chrony=4.8-r1 \
-    htpdate=2.0.0-r0 \
-    tzdata=2025c-r0 \
+    chrony~=4.8 \
+    htpdate~=2.0.0 \
+    tzdata \
  && apk upgrade --no-cache
 
 COPY chrony.conf /etc/chrony/chrony.conf
@@ -19,6 +21,6 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 123/udp
 
 HEALTHCHECK --interval=60s --timeout=5s --start-period=30s --retries=3 \
-    CMD chronyc tracking || exit 1
+    CMD pgrep htpdate >/dev/null && chronyc tracking || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]

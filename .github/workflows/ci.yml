@@ -25,11 +25,20 @@ jobs:
       - name: Build image
         run: docker build -t ${{ github.repository }}:test .
 
-      - name: Smoke test — chrony responds
+      - name: Smoke test — chrony responds, htpdate alive
         run: |
           docker run -d --name smoke --cap-add SYS_TIME \
             -p 11123:123/udp \
             ${{ github.repository }}:test
           sleep 5
           docker exec smoke chronyc tracking
-          docker stop smoke
+          docker exec smoke pgrep htpdate
+
+      - name: Smoke test — container exits if htpdate dies
+        run: |
+          docker exec smoke pkill htpdate
+          sleep 40
+          status="$(docker inspect -f '{{.State.Status}} {{.State.ExitCode}}' smoke)"
+          echo "container state: $status"
+          test "$status" = "exited 1"
+          docker rm smoke
